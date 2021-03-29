@@ -1,0 +1,121 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\begin{document}
+
+\title{House Prices - Advanced Regression Techniques\\
+{\footnotesize}}
+
+\author{\IEEEauthorblockN{1 Chang,Li-Ko}
+\and
+\IEEEauthorblockN{2 Kuo,Tun-Yu}}
+\maketitle
+
+\begin{abstract}
+Ask a home buyer to describe their dream house, and they probably won't begin with the height of the basement ceiling or the proximity to an east-west railroad. But this playground competition's dataset proves that much more influences price negotiations than the number of bedrooms or a white-picket fence.
+With 79 explanatory variables describing (almost) every aspect of residential homes in Ames, Iowa, this competition challenges you to predict the final price of each home.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Box-Cox,Ridge,Lasso,ElasticNet
+\end{IEEEkeywords}
+
+\section{Introduction}
+We use the data including lot area,neighborhood,street, etc. to predict the hourse price.The target variable is house sale prices and is continuous variable.\\
+\\
+\section{Method}
+\subsection{Box-Cox}
+When we do linear regression again, it is based on the assumption of normal distribution, so in actual analysis, sometimes data conversion is required to make the data obey the normal distribution.
+
+Data transformations include square of y, $\ln_{}{y}$ , etc. But it takes time to understand the nature of the data, so this function automatically finds the "best" transformation function based on the data.
+
+The one-parameter Box–Cox transformations are defined as :
+$$y_i^{(\lambda)} =
+\begin{cases}
+\frac{y^{\lambda}_{_i}-1}{\lambda}  \hspace{0.25cm} if \hspace{0.25cm}\lambda \neq 0,
+\\
+\ln_{}{y_i} \hspace{0.25cm} if \hspace{0.25cm}\lambda = 0,
+\\
+\end{cases}$$
+
+
+\subsection{Lasso}
+The least absolute selection and shrinkage (LASSO) method is another popular choice. In lasso regression, the lasso penalty function R is $\ell1$ norm,i.e.
+$$R(w) =  \sum_{j=1}^{d} \left | w_j \right | $$
+$$\frac{1}{n} \left \| Y-Xw \right \| {^2_2} + {\lambda}\sum_{j=1}^{d} \left | w_j \right | \to\mathop{min}\limits_{w\in{R^d}}$$
+~\\
+Note that the lasso penalty function is convex but not strictly convex. Unlike Tikhonov regularization, this scheme does not have a convenient closed-form solution: instead, the solution is typically found using quadratic programming or more general convex optimization methods, as well as by specific algorithms such as the least-angle regression algorithm.
+~\\
+An important difference between lasso regression and Tikhonov regularization is that lasso regression forces more entries of w to actually equal 0 than would otherwise. In contrast, while Tikhonov regularization forces entries of w to be small, it does not force more of them to be 0 than would be otherwise. Thus, LASSO regularization is more appropriate than Tikhonov regularization in cases in which we expect the number of non-zero entries of w to be small, and Tikhonov regularization is more appropriate when we expect that entries of w will generally be small but not necessarily zero. Which of these regimes is more relevant depends on the specific data set at hand.
+~\\
+Besides feature selection described above, LASSO has some limitations. Ridge regression provides better accuracy in the case n>d for highly correlated variables.In another case, n<d, LASSO selects at most n variables. Moreover, LASSO tends to select some arbitrary variables from group of highly correlated samples, so there is no grouping effect.
+
+\subsection{Ridge}
+One particularly common choice for the penalty function R is the squared $\ell2$ norm, i.e.,
+~\\
+$$R(w)=\sum_{j=1}^{d} w{^2_j}$$
+$$\frac{1}{n} \left \| Y-Xw \right \| {^2_2} + {\lambda}\sum_{j=1}^{d} {\left | w_j \right |}^2 \to\mathop{min}\limits_{w\in{R^d}}$$
+
+The most common names for this are called Tikhonov regularization and ridge regression. It admits a closed-form solution for w:
+$$w=(X^{T}X + \lambda I)^{-1} X^{T}Y$$
+
+The name ridge regression alludes to the fact that the $\alpha I$ term adds positive entries along the diagonal "ridge" of the sample covariance matrix $X^{T}X$.
+~\\
+When $\alpha=0$, i.e., in the case of ordinary least squares, the condition that $d>n$ causes the sample covariance matrix $X^{T}X$ to not have full rank and so it cannot be inverted to yield a unique solution. This is why there can be an infinitude of solutions to the ordinary least squares problem when $d>n$. However, when $\alpha>0$, i.e., when ridge regression is used, the addition of $\alphaI$ to the sample covariance matrix ensures that all of its eigenvalues will be strictly greater than 0. In other words, it becomes invertible, and the solution becomes unique.
+~\\
+Compared to ordinary least squares, ridge regression is not unbiased. It accepts little bias to reduce variance and the mean square error, and helps to improve the prediction accuracy. Thus, ridge estimator yields more stable solutions by shrinking coefficients but suffers from the lack of sensitivity to the data.
+
+~\\
+~\\
+~\\
+\subsection{ElasticNet}
+The elastic net method overcomes the limitations of the LASSO (least absolute shrinkage and selection operator) method which uses a penalty function based on
+
+$$||\beta ||_{1} =  {\textstyle \sum_{j=1}^{p}} |\beta_{j} |$$
+
+Use of this penalty function has several limitations.For example, in the "large p, small n" case (high-dimensional data with few examples), the LASSO selects at most n variables before it saturates. Also if there is a group of highly correlated variables, then the LASSO tends to select one variable from a group and ignore the others. To overcome these limitations, the elastic net adds a quadratic part to the penalty $\left ( \left \| \beta ^{2}  \right \|  \right )$ , which when used alone is ridge regression (known also as Tikhonov regularization). The estimates from the elastic net method are defined by
+
+$$\widehat{\beta} \equiv \mathop{argmin}\limits_{\beta}(\left \| y-X\beta  \right \| ^2+\lambda _2\left \|  \beta \right \|^2+ 
+\lambda _1\left \|  \beta \right \|_1)$$
+
+\section{Analysis process}
+We use three methods to predict the house prices, namely Lasso, Ridge and ElasticNet.\\
+~\\
+The analysis process is as follows:\\
+1.Date preprocessing\\
+2.Import data\\
+3.Standardization\\
+4.Training model\\
+5.Predict\\
+6.Evaluate the models\\
+
+
+\section{Analysis result}
+
+According to Figure, We observe that the mean square error of the elastic net method is the smallest among the three models, and R square is also the largest among the three. Therefore, we can know that the elastic net method is the best among them.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[height=2cm]{compare.jpg}}
+\caption{Analysis result.}
+\label{fig1}
+\end{figure}
+
+
+\section{Reference}
+\begin{flushleft}
+1.https://en.wikipedia.org/wiki/Regularized\_least\_squares# Lasso\_regression\\
+2.https://en.wikipedia.org/wiki/Tikhonov\_regularization\\
+3.https://en.wikipedia.org/wiki/Elastic\_net\_regularization\\
+4.https://www.kaggle.com/c/house-prices-advanced-regression-techniques\\
+\end{flushleft}
+\end{document}
+
+
